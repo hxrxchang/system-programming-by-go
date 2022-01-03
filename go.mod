@@ -1,3 +1,3 @@
-module github.com/hxrxchang/go-template
+module github.com/hxrxchang/system-programming-by-go
 
 go 1.16
