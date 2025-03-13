@@ -13,16 +13,20 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	request, err := http.NewRequest("GET", "http://localhost:8888", nil)
+
+	req, err := http.NewRequest("GET", "http://localhost:8888", nil)
 	if err != nil {
 		panic(err)
 	}
-	request.Write(conn)
-	response, err := http.ReadResponse(bufio.NewReader(conn), request)
+
+	req.Write(conn)
+
+	res, err := http.ReadResponse(bufio.NewReader(conn), req)
 	if err != nil {
 		panic(err)
 	}
-	dump, err := httputil.DumpResponse(response, true)
+
+	dump, err := httputil.DumpResponse(res, true)
 	if err != nil {
 		panic(err)
 	}
