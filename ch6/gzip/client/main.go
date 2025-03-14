@@ -28,51 +28,50 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
-			fmt.Printf("Access: %d\n", current)
+			fmt.Printf("Access: %v\n", current)
 		}
 
-		request, err := http.NewRequest(
-			"POST",
-			"http://localhost:8888",
-			strings.NewReader(sendMessages[current]))
+		req, err := http.NewRequest("POST", "http://localhost:8888", strings.NewReader(sendMessages[current]))
 		if err != nil {
 			panic(err)
 		}
-		request.Header.Set("Accept-Encoding", "gzip")
-		err = request.Write(conn)
+		req.Header.Set("Accept-Encoding", "gzip")
+		err = req.Write(conn)
 		if err != nil {
 			panic(err)
 		}
 
-		response, err := http.ReadResponse(
-			bufio.NewReader(conn), request)
+		res, err := http.ReadResponse(bufio.NewReader(conn), req)
 		if err != nil {
 			fmt.Println("Retry")
 			conn = nil
 			continue
 		}
-		dump, err := httputil.DumpResponse(response, false)
+
+		dump, err := httputil.DumpResponse(res, false)
 		if err != nil {
 			panic(err)
 		}
 		fmt.Println(string(dump))
 
-		defer response.Body.Close()
+		defer res.Body.Close()
 
-		if response.Header.Get("Content-Encoding") == "gzip" {
-			reader, err := gzip.NewReader(response.Body)
+		if res.Header.Get("Content-Encoding") == "gzip" {
+			reader, err := gzip.NewReader(res.Body)
 			if err != nil {
 				panic(err)
 			}
 			io.Copy(os.Stdout, reader)
 			reader.Close()
 		} else {
-			io.Copy(os.Stdout, response.Body)
+			io.Copy(os.Stdout, res.Body)
 		}
+
 		current++
 		if current == len(sendMessages) {
 			break
 		}
 	}
+
 	conn.Close()
 }
