@@ -25,38 +25,35 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
-			fmt.Printf("Access: %d\n", current)
+			fmt.Printf("Access: %v\n", current)
 		}
 
-		request, err := http.NewRequest(
-			"POST",
-			"http://localhost:8888",
-			strings.NewReader(sendMessages[current]))
+		req, err := http.NewRequest("POST", "http://localhost:8888", strings.NewReader(sendMessages[current]))
 		if err != nil {
 			panic(err)
 		}
-		err = request.Write(conn)
+		err = req.Write(conn)
 		if err != nil {
 			panic(err)
 		}
 
-		response, err := http.ReadResponse(
-			bufio.NewReader(conn), request)
+		res, err := http.ReadResponse(bufio.NewReader(conn), req)
 		if err != nil {
 			fmt.Println("Retry")
 			conn = nil
 			continue
 		}
-		dump, err := httputil.DumpResponse(response, true)
+
+		dump, err := httputil.DumpResponse(res, true)
 		if err != nil {
 			panic(err)
 		}
 		fmt.Println(string(dump))
-
 		current++
 		if current == len(sendMessages) {
 			break
 		}
 	}
+
 	conn.Close()
 }
